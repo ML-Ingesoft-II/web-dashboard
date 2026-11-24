@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-950 text-slate-100 antialiased;
+}
+
+html.light body {
+  @apply bg-[#faf9f5] text-slate-800;
+}
+
+/* Superficies reutilizables que se adaptan al tema. */
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-800 bg-slate-900/60 p-5;
+  }
+  html.light .card {
+    @apply border-slate-200 bg-white;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-sm
+      text-slate-100 placeholder:text-slate-500 outline-none
+      focus:border-brand focus:ring-2 focus:ring-brand/30;
+  }
+  html.light .input {
+    @apply border-slate-300 bg-white text-slate-800 placeholder:text-slate-400;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400;
+  }
+  html.light .label {
+    @apply text-slate-500;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-2.5
+      text-sm font-semibold text-white transition hover:bg-brand-hover
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600
+      px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800;
+  }
+  html.light .btn-ghost {
+    @apply border-slate-300 text-slate-700 hover:bg-slate-100;
+  }
+
+  .th {
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400;
+  }
+  .td {
+    @apply px-4 py-4 text-sm text-slate-200;
+  }
+  html.light .td {
+    @apply text-slate-700;
+  }
+}

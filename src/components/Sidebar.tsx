@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { Sesion } from "@/lib/api-types";
 import { api } from "@/lib/client";
-import { useTheme } from "@/lib/useTheme";
 
 const NAV = [
   { href: "/flota", etiqueta: "Estado de la flota", icono: "🚚" },
@@ -15,7 +14,6 @@ const NAV = [
 export function Sidebar({ sesion }: { sesion: Sesion | null }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { esClaro, alternar } = useTheme();
 
   async function cerrarSesion() {
     await api("/auth/logout", { method: "POST" });
@@ -57,28 +55,7 @@ export function Sidebar({ sesion }: { sesion: Sesion | null }) {
         })}
       </nav>
 
-      <div className="mt-auto space-y-5 pt-6">
-        <button
-          onClick={alternar}
-          className="flex w-full items-center justify-between text-sm text-slate-300"
-        >
-          <span className="flex items-center gap-2">
-            <span aria-hidden>{esClaro ? "🌙" : "☀️"}</span>
-            Modo {esClaro ? "oscuro" : "claro"}
-          </span>
-          <span
-            className={`relative h-5 w-10 rounded-full transition ${
-              esClaro ? "bg-brand" : "bg-slate-600"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
-                esClaro ? "left-5" : "left-0.5"
-              }`}
-            />
-          </span>
-        </button>
-
+      <div className="mt-auto pt-6">
         <div className="border-t border-slate-800 pt-4">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-slate-200">

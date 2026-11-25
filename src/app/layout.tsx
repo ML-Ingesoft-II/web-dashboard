@@ -7,14 +7,6 @@ export const metadata: Metadata = {
   description: "Panel web del despachador del sistema Tire.",
 };
 
-// Aplica el tema guardado antes del primer render para evitar parpadeo.
-const scriptTema = `
-try {
-  var t = localStorage.getItem('tire-tema');
-  if (t === 'light') document.documentElement.classList.add('light');
-} catch (e) {}
-`;
-
 export default function RootLayout({
   children,
 }: {
@@ -22,9 +14,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: scriptTema }} />
-      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

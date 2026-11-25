@@ -4,9 +4,15 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { AuthCard } from "@/components/AuthCard";
+import { Aviso } from "@/components/Aviso";
 import { api, ApiError } from "@/lib/client";
 
-export default function LoginPage() {
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { motivo?: string };
+}) {
+  const sesionExpirada = searchParams.motivo === "sesion-expirada";
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,6 +43,9 @@ export default function LoginPage() {
   return (
     <AuthCard titulo="Inicia sesión">
       <form onSubmit={enviar} className="space-y-4">
+        {sesionExpirada && !error && (
+          <Aviso sobreSuperficie>Tu sesión expiró. Vuelve a iniciar sesión.</Aviso>
+        )}
         <div>
           <label className="label" htmlFor="email">
             Correo electrónico

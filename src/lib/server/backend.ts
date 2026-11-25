@@ -4,6 +4,7 @@ import {
   guardarSesion,
   leerAccessToken,
   leerRefreshToken,
+  limpiarSesion,
 } from "@/lib/server/session";
 
 const API = process.env.TIRE_API_URL ?? "http://localhost:8080";
@@ -13,6 +14,17 @@ export interface RespuestaBackend {
   ok: boolean;
   body: unknown;
 }
+
+/** Respuesta cuando el backend no contesta (apagado, sin red, etc.). */
+const SIN_CONEXION: RespuestaBackend = {
+  status: 503,
+  ok: false,
+  body: {
+    title: "Servicio no disponible",
+    status: 503,
+    detail: "No se pudo conectar con el servidor. Intenta de nuevo en unos minutos.",
+  },
+};
 
 async function parse(res: Response): Promise<unknown> {
   const texto = await res.text();
@@ -29,12 +41,16 @@ export async function backendPublico(
   path: string,
   init?: RequestInit
 ): Promise<RespuestaBackend> {
-  const res = await fetch(`${API}${path}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
-    cache: "no-store",
-  });
-  return { status: res.status, ok: res.ok, body: await parse(res) };
+  try {
+    const res = await fetch(`${API}${path}`, {
+      ...init,
+      headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+      cache: "no-store",
+    });
+    return { status: res.status, ok: res.ok, body: await parse(res) };
+  } catch {
+    return SIN_CONEXION;
+  }
 }
 
 async function intentarRefrescar(): Promise<string | null> {
@@ -54,7 +70,9 @@ async function intentarRefrescar(): Promise<string | null> {
 
 /**
  * Llama al backend con el access token de la cookie. Si el backend responde
- * 401, intenta renovar con el refresh token una vez y reintenta.
+ * 401, intenta renovar con el refresh token una vez y reintenta. Si aun así
+ * responde 401, la sesión ya no sirve: se borran las cookies para que el
+ * panel envíe al usuario al inicio de sesión.
  */
 export async function backendAutenticado(
   path: string,
@@ -73,13 +91,20 @@ export async function backendAutenticado(
       cache: "no-store",
     });
 
-  let res = await hacer(token);
-  if (res.status === 401) {
-    const nuevo = await intentarRefrescar();
-    if (nuevo) {
-      token = nuevo;
-      res = await hacer(token);
+  try {
+    let res = await hacer(token);
+    if (res.status === 401) {
+      const nuevo = await intentarRefrescar();
+      if (nuevo) {
+        token = nuevo;
+        res = await hacer(token);
+      }
     }
+    if (res.status === 401) {
+      limpiarSesion();
+    }
+    return { status: res.status, ok: res.ok, body: await parse(res) };
+  } catch {
+    return SIN_CONEXION;
   }
-  return { status: res.status, ok: res.ok, body: await parse(res) };
 }

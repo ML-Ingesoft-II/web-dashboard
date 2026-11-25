@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import type { ConductorResponse } from "@/lib/api-types";
-import { api } from "@/lib/client";
+import { api, ApiError } from "@/lib/client";
+import { estadoDeConsulta } from "@/lib/estados";
+import { Aviso } from "@/components/Aviso";
+import { EstadoVista } from "@/components/EstadoVista";
 import { ConductorForm } from "@/components/ConductorForm";
 import { fechaRelativa } from "@/lib/format";
 
@@ -36,8 +39,19 @@ export default function EditarConductorPage({
         )}
       </header>
 
-      {query.isLoading && <p className="text-fg-muted">Cargando…</p>}
-      {query.isError && <p className="text-critical">No se encontró el conductor.</p>}
+      {query.error instanceof ApiError && query.error.status === 404 ? (
+        <Aviso titulo="No se encontró el conductor.">
+          Es posible que el enlace esté incompleto. Vuelve al listado de conductores.
+        </Aviso>
+      ) : (
+        <EstadoVista
+          estado={estadoDeConsulta(query, false)}
+          error={query.error}
+          textoVacio=""
+          textoError="No se pudo cargar el conductor."
+          onReintentar={() => query.refetch()}
+        />
+      )}
       {query.data && (
         <ConductorForm modo="editar" id={params.id} inicial={query.data} />
       )}

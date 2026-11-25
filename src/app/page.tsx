@@ -6,6 +6,18 @@ import { useState } from "react";
 import { AuthCard } from "@/components/AuthCard";
 import { Aviso } from "@/components/Aviso";
 import { api, ApiError } from "@/lib/client";
+import { mensajeDeError } from "@/lib/estados";
+
+/** En el login, 401 significa credenciales incorrectas, no sesión vencida. */
+function mensajeDeLogin(err: unknown): string {
+  if (err instanceof ApiError && err.status === 401) {
+    return err.problem.detail || "Correo o contraseña incorrectos.";
+  }
+  if (err instanceof ApiError && err.status === 403) {
+    return err.problem.detail || "Este panel es solo para despachadores.";
+  }
+  return mensajeDeError(err, "No se pudo iniciar sesión.");
+}
 
 export default function LoginPage({
   searchParams,
@@ -17,6 +29,7 @@ export default function LoginPage({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [sinPermiso, setSinPermiso] = useState(false);
   const [cargando, setCargando] = useState(false);
 
   async function enviar(e: React.FormEvent) {
@@ -31,11 +44,8 @@ export default function LoginPage({
       router.push("/flota");
       router.refresh();
     } catch (err) {
-      const msg =
-        err instanceof ApiError
-          ? err.problem.detail || "Correo o contraseña incorrectos."
-          : "No se pudo iniciar sesión.";
-      setError(msg);
+      setSinPermiso(err instanceof ApiError && err.status === 403);
+      setError(mensajeDeLogin(err));
       setCargando(false);
     }
   }
@@ -83,9 +93,13 @@ export default function LoginPage({
         </div>
 
         {error && (
-          <p className="rounded-lg bg-tag-critical-bg px-3 py-2 text-sm text-critical">
+          <Aviso
+            sobreSuperficie
+            icono={sinPermiso ? "candado" : "info"}
+            titulo={sinPermiso ? "No tienes permiso" : undefined}
+          >
             {error}
-          </p>
+          </Aviso>
         )}
 
         <button type="submit" className="btn-primary w-full" disabled={cargando}>

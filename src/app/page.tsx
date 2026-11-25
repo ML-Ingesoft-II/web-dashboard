@@ -67,14 +67,14 @@ export default function LoginPage() {
         <div className="text-right">
           <Link
             href="/recuperar"
-            className="text-sm text-brand hover:underline"
+            className="text-sm text-primary-text hover:underline"
           >
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">
+          <p className="rounded-lg bg-tag-critical-bg px-3 py-2 text-sm text-critical">
             {error}
           </p>
         )}

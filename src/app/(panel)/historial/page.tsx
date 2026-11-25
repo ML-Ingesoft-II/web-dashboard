@@ -11,6 +11,8 @@ import type {
 } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { ETIQUETA_TIPO_EVENTO, fechaHoraLarga } from "@/lib/format";
+import { Etiqueta } from "@/components/EstadoBadge";
+import { Paginacion } from "@/components/Paginacion";
 
 const TAM = 8;
 
@@ -29,17 +31,17 @@ function textoRespuesta(e: EventoHistorial): string {
 function BadgeAtencion({ atencion }: { atencion: AtencionEvento }) {
   if (atencion === "SIN_ATENDER")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-400">
-        ⊘ Sin atender
-      </span>
+      <Etiqueta
+        clase="bg-tag-critical-bg text-tag-critical-fg"
+        icono="⊘"
+        texto="Sin atender"
+      />
     );
   if (atencion === "ATENDIDA")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400">
-        ✓ Atendida
-      </span>
+      <Etiqueta clase="bg-tag-normal-bg text-tag-normal-fg" icono="✓" texto="Atendida" />
     );
-  return <span className="text-xs text-slate-500">No requiere</span>;
+  return <span className="text-sm text-fg-muted">No requiere</span>;
 }
 
 export default function HistorialPage() {
@@ -82,8 +84,8 @@ export default function HistorialPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-white">Historial de incidentes</h1>
-        <p className="text-sm text-slate-400">Eventos de fatiga de la flota.</p>
+        <h1 className="text-2xl font-bold text-fg">Historial de incidentes</h1>
+        <p className="text-sm text-fg-muted">Eventos de fatiga de la flota.</p>
       </header>
 
       <section className="card">
@@ -105,7 +107,7 @@ export default function HistorialPage() {
             </select>
           </div>
           <div className="flex gap-2">
-            <button onClick={limpiar} className="btn-ghost">
+            <button onClick={limpiar} className="btn-secondary">
               Limpiar
             </button>
             <button onClick={aplicar} className="btn-primary">
@@ -117,7 +119,7 @@ export default function HistorialPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-800">
+              <tr className="border-b border-border">
                 <th className="th">Fecha y hora</th>
                 <th className="th">Conductor</th>
                 <th className="th">Placa</th>
@@ -130,15 +132,15 @@ export default function HistorialPage() {
             <tbody>
               {query.isLoading && (
                 <tr>
-                  <td className="td text-slate-400" colSpan={7}>
+                  <td className="td text-fg-muted" colSpan={7}>
                     Cargando…
                   </td>
                 </tr>
               )}
               {datos?.contenido.map((e) => (
-                <tr key={e.id} className="border-b border-slate-800/60">
-                  <td className="td text-slate-300">{fechaHoraLarga(e.fechaHora)}</td>
-                  <td className="td font-medium text-slate-100">
+                <tr key={e.id} className="border-b border-border">
+                  <td className="td text-fg">{fechaHoraLarga(e.fechaHora)}</td>
+                  <td className="td font-medium text-fg">
                     {e.conductor.nombreCompleto}
                   </td>
                   <td className="td">{e.conductor.placaVehiculo ?? "—"}</td>
@@ -151,12 +153,12 @@ export default function HistorialPage() {
                     {e.alertaId ? (
                       <Link
                         href={`/alertas/${e.alertaId}`}
-                        className="rounded-lg border border-brand/50 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/10"
+                        className="btn-secondary min-h-9 px-3 text-sm"
                       >
                         Ver detalle
                       </Link>
                     ) : (
-                      <span className="text-xs text-slate-600">—</span>
+                      <span className="text-xs text-fg-muted">—</span>
                     )}
                   </td>
                 </tr>
@@ -165,26 +167,12 @@ export default function HistorialPage() {
           </table>
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
-          <span>
-            Mostrando {desdeN} a {hastaN} de {total} incidentes
-          </span>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="disabled:opacity-40">
-              ‹ Anterior
-            </button>
-            <span>
-              Página {page + 1} de {totalPaginas}
-            </span>
-            <button
-              onClick={() => setPage(Math.min(totalPaginas - 1, page + 1))}
-              disabled={page >= totalPaginas - 1}
-              className="font-semibold text-slate-200 disabled:opacity-40"
-            >
-              Siguiente ›
-            </button>
-          </div>
-        </div>
+        <Paginacion
+          mostrando={`Mostrando ${desdeN} a ${hastaN} de ${total} incidentes`}
+          pagina={page}
+          totalPaginas={totalPaginas}
+          onCambio={setPage}
+        />
       </section>
     </div>
   );

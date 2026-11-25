@@ -2,45 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Tokens del sistema de diseño Tire, tema oscuro (paleta A, azul noche).
+ * Fuente: sistema de diseño "Tire" en Claude Design (project/tokens.json) y
+ * los mockups del Prototipo 1. El panel solo usa el tema oscuro por ahora.
+ */
 :root {
   color-scheme: dark;
+
+  --background: #0f1729;
+  --surface: #1d283a;
+  --surface-2: #273244; /* encabezado de tablas */
+  --border: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --on-primary: #ffffff;
+  --primary-text: #60a5fa; /* enlaces, botones secundarios, foco */
+  --primary-border: #3c83f6;
+
+  --status-normal: #22c55e;
+  --status-warning: #f59e0b;
+  --status-critical-text: #f87171;
+  --status-critical-bg: #dc2626; /* solo alarma y alertas críticas */
+  --on-critical: #ffffff;
+  --on-critical-muted: #fff1f2;
+  --status-offline: #94a3b8;
+
+  /* Etiquetas de estado del panel web (valores de los mockups). */
+  --tag-normal-fg: #92deae;
+  --tag-normal-bg: #182f29;
+  --tag-warning-fg: #ecc96a;
+  --tag-warning-bg: #342c1d;
+  --tag-critical-fg: #eea4a4;
+  --tag-critical-bg: #36202a;
+  --tag-offline-fg: #c0cad8;
+  --tag-offline-bg: #273244;
 }
 
 body {
-  @apply bg-slate-950 text-slate-100 antialiased;
+  @apply bg-background font-sans text-base text-fg antialiased;
 }
 
-/* Superficies reutilizables del panel (solo tema oscuro). */
+/* Componentes base del panel (equivalen a los de bundle.css del sistema). */
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-800 bg-slate-900/60 p-5;
+    @apply rounded-card bg-surface p-6;
   }
 
   .input {
-    @apply w-full rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-sm
-      text-slate-100 placeholder:text-slate-500 outline-none
-      focus:border-brand focus:ring-2 focus:ring-brand/30;
+    @apply min-h-[44px] w-full rounded-control border border-border bg-surface px-3 text-base
+      text-fg outline-none placeholder:text-fg-muted
+      focus:border-primary-text focus:ring-2 focus:ring-primary-text;
   }
 
   .label {
-    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400;
+    @apply mb-2 block text-sm font-medium text-fg-muted;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-2.5
-      text-sm font-semibold text-white transition hover:bg-brand-hover
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-control bg-primary px-4
+      text-base font-medium text-on-primary transition hover:bg-primary-hover
+      focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px]
+      focus-visible:outline-primary-text
       disabled:cursor-not-allowed disabled:opacity-50;
   }
 
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-600
-      px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800;
+  .btn-secondary {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-control border
+      border-primary-border bg-transparent px-4 text-base font-medium text-primary-text transition
+      hover:bg-surface
+      focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px]
+      focus-visible:outline-primary-text
+      disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .th {
-    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400;
+    @apply bg-surface-2 px-5 py-3 text-left text-sm font-medium text-[#cbd5e1];
   }
+
   .td {
-    @apply px-4 py-4 text-sm text-slate-200;
+    @apply px-5 py-3.5 text-sm text-fg;
+  }
+
+  .link {
+    @apply text-primary-text hover:underline;
   }
 }

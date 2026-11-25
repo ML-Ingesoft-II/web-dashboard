@@ -7,8 +7,12 @@ import { api, ApiError } from "@/lib/client";
 
 function Regla({ ok, texto }: { ok: boolean; texto: string }) {
   return (
-    <p className={`text-xs ${ok ? "text-emerald-400" : "text-slate-500"}`}>
-      {ok ? "✓" : "○"} {texto}
+    <p className={`flex items-center gap-2 text-sm ${ok ? "text-normal" : "text-fg-muted"}`}>
+      {/* El check solo aparece cuando la regla se cumple; el espacio se reserva igual. */}
+      <span className="flex h-[18px] w-[18px] items-center justify-center">
+        {ok ? "✓" : "○"}
+      </span>
+      {texto}
     </p>
   );
 }
@@ -72,7 +76,7 @@ function Formulario() {
             <span
               key={i}
               className={`h-1 flex-1 rounded-full ${
-                i < fuerza ? "bg-emerald-500" : "bg-slate-700"
+                i < fuerza ? "bg-normal" : "bg-border"
               }`}
             />
           ))}
@@ -98,7 +102,7 @@ function Formulario() {
       </div>
 
       {error && (
-        <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">
+        <p className="rounded-lg bg-tag-critical-bg px-3 py-2 text-sm text-critical">
           {error}
         </p>
       )}

@@ -1,12 +1,16 @@
 import type { EstadoMonitoreo } from "@/lib/api-types";
 import { ETIQUETA_ESTADO } from "@/lib/format";
 
+/**
+ * Etiqueta de estado (StatusTag del sistema de diseño): color, ícono y texto,
+ * nunca solo color.
+ */
 const ESTILOS: Record<EstadoMonitoreo, string> = {
-  NORMAL: "bg-emerald-500/15 text-emerald-400 ring-emerald-500/30",
-  PRECAUCION: "bg-amber-500/15 text-amber-400 ring-amber-500/30",
-  CRITICO: "bg-red-500/15 text-red-400 ring-red-500/30",
-  SIN_SENAL: "bg-slate-500/15 text-slate-300 ring-slate-500/30",
-  SIN_VIAJE: "bg-slate-500/10 text-slate-400 ring-slate-500/20",
+  NORMAL: "bg-tag-normal-bg text-tag-normal-fg",
+  PRECAUCION: "bg-tag-warning-bg text-tag-warning-fg",
+  CRITICO: "bg-tag-critical-bg text-tag-critical-fg",
+  SIN_SENAL: "bg-tag-offline-bg text-tag-offline-fg",
+  SIN_VIAJE: "bg-transparent text-fg-muted",
 };
 
 const ICONO: Record<EstadoMonitoreo, string> = {
@@ -18,12 +22,25 @@ const ICONO: Record<EstadoMonitoreo, string> = {
 };
 
 export function EstadoBadge({ estado }: { estado: EstadoMonitoreo }) {
+  return <Etiqueta clase={ESTILOS[estado]} icono={ICONO[estado]} texto={ETIQUETA_ESTADO[estado]} />;
+}
+
+/** Píldora genérica del sistema de diseño (también para "Atendida", "Sin atender"…). */
+export function Etiqueta({
+  clase,
+  icono,
+  texto,
+}: {
+  clase: string;
+  icono: string;
+  texto: string;
+}) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${ESTILOS[estado]}`}
+      className={`inline-flex min-h-8 items-center gap-2 whitespace-nowrap rounded-full py-1 pl-2 pr-3 text-sm font-medium ${clase}`}
     >
-      <span aria-hidden>{ICONO[estado]}</span>
-      {ETIQUETA_ESTADO[estado]}
+      <span aria-hidden>{icono}</span>
+      {texto}
     </span>
   );
 }

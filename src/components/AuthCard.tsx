@@ -6,15 +6,13 @@ export function AuthCard({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/70 p-8 shadow-xl">
-        <h1 className="text-center text-4xl font-bold text-white">Tire</h1>
-        <p className="mb-6 text-center text-sm text-slate-400">
-          Panel del despachador
-        </p>
-        <h2 className="mb-5 text-center text-lg font-semibold text-slate-100">
-          {titulo}
-        </h2>
+    <main className="flex min-h-screen items-center justify-center px-6 py-12">
+      <div className="w-full max-w-[420px] rounded-card bg-surface p-10">
+        <div className="mb-5 flex flex-col gap-1 text-center">
+          <h1 className="text-[40px] font-bold leading-[48px] text-fg">Tire</h1>
+          <p className="text-base text-fg-muted">Panel del despachador</p>
+        </div>
+        <h2 className="mb-5 text-center text-lg font-bold text-fg">{titulo}</h2>
         {children}
       </div>
     </main>

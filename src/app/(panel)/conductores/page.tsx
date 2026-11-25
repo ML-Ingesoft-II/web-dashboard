@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ConductorResponse, Pagina } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { formatearDocumento } from "@/lib/format";
+import { Paginacion } from "@/components/Paginacion";
 
 const TAM = 8;
 
@@ -50,8 +51,8 @@ export default function ConductoresPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <header className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Conductores</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-fg">Conductores</h1>
+          <p className="text-sm text-fg-muted">
             {total} conductores {estado === "activos" ? "activos " : ""}en tu flota
           </p>
         </div>
@@ -94,7 +95,7 @@ export default function ConductoresPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-800">
+              <tr className="border-b border-border">
                 <th className="th">Nombre</th>
                 <th className="th">Documento</th>
                 <th className="th">Correo</th>
@@ -106,14 +107,14 @@ export default function ConductoresPage() {
             <tbody>
               {query.isLoading && (
                 <tr>
-                  <td className="td text-slate-400" colSpan={6}>
+                  <td className="td text-fg-muted" colSpan={6}>
                     Cargando…
                   </td>
                 </tr>
               )}
               {datos?.contenido.map((c) => (
-                <tr key={c.id} className="border-b border-slate-800/60">
-                  <td className="td font-medium text-slate-100">
+                <tr key={c.id} className="border-b border-border">
+                  <td className="td font-medium text-fg">
                     {c.nombreCompleto}
                   </td>
                   <td className="td">
@@ -126,7 +127,7 @@ export default function ConductoresPage() {
                     <div className="flex justify-end gap-2">
                       <Link
                         href={`/conductores/${c.id}/editar`}
-                        className="rounded-lg border border-brand/50 px-3 py-1.5 text-xs font-medium text-brand hover:bg-brand/10"
+                        className="btn-secondary min-h-9 px-3 text-sm"
                       >
                         Editar
                       </Link>
@@ -136,7 +137,7 @@ export default function ConductoresPage() {
                             if (confirm(`¿Desactivar a ${c.nombreCompleto}?`))
                               desactivar.mutate(c.id);
                           }}
-                          className="rounded-lg border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800"
+                          className="btn-secondary min-h-9 px-3 text-sm"
                         >
                           Desactivar
                         </button>
@@ -149,30 +150,12 @@ export default function ConductoresPage() {
           </table>
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
-          <span>
-            Mostrando {desde} a {hasta} de {total}
-          </span>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setPage(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className="disabled:opacity-40"
-            >
-              ‹ Anterior
-            </button>
-            <span>
-              Página {page + 1} de {totalPaginas}
-            </span>
-            <button
-              onClick={() => setPage(Math.min(totalPaginas - 1, page + 1))}
-              disabled={page >= totalPaginas - 1}
-              className="font-semibold text-slate-200 disabled:opacity-40"
-            >
-              Siguiente ›
-            </button>
-          </div>
-        </div>
+        <Paginacion
+          mostrando={`Mostrando ${desde} a ${hasta} de ${total}`}
+          pagina={page}
+          totalPaginas={totalPaginas}
+          onCambio={setPage}
+        />
       </section>
     </div>
   );

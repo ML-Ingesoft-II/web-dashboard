@@ -11,7 +11,9 @@ import type {
 } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { ETIQUETA_TIPO_EVENTO, fechaHoraLarga } from "@/lib/format";
+import { estadoDeConsulta } from "@/lib/estados";
 import { Etiqueta } from "@/components/EstadoBadge";
+import { FilaEstado } from "@/components/EstadoVista";
 import { Paginacion } from "@/components/Paginacion";
 
 const TAM = 8;
@@ -130,13 +132,18 @@ export default function HistorialPage() {
               </tr>
             </thead>
             <tbody>
-              {query.isLoading && (
-                <tr>
-                  <td className="td text-fg-muted" colSpan={7}>
-                    Cargando…
-                  </td>
-                </tr>
-              )}
+              <FilaEstado
+                columnas={7}
+                estado={estadoDeConsulta(query, (datos?.contenido.length ?? 0) === 0)}
+                error={query.error}
+                textoVacio={
+                  aplicados.desde || aplicados.hasta || aplicados.tipo
+                    ? "No hay incidentes con esos filtros."
+                    : "Todavía no hay incidentes registrados."
+                }
+                textoError="No se pudo cargar el historial de incidentes."
+                onReintentar={() => query.refetch()}
+              />
               {datos?.contenido.map((e) => (
                 <tr key={e.id} className="border-b border-border">
                   <td className="td text-fg">{fechaHoraLarga(e.fechaHora)}</td>

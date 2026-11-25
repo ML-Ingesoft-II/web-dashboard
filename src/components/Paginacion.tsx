@@ -1,3 +1,5 @@
+import { Icono } from "@/components/Icono";
+
 /** Pie de tabla con el texto "Mostrando…" y los botones Anterior / Siguiente. */
 export function Paginacion({
   mostrando,
@@ -22,7 +24,8 @@ export function Paginacion({
           disabled={pagina === 0}
           className={boton}
         >
-          ‹ Anterior
+          <Icono nombre="anterior" tamano={18} />
+          Anterior
         </button>
         <span className="px-2">
           Página {pagina + 1} de {totalPaginas}
@@ -32,7 +35,8 @@ export function Paginacion({
           disabled={pagina >= totalPaginas - 1}
           className={boton}
         >
-          Siguiente ›
+          Siguiente
+          <Icono nombre="siguiente" tamano={18} />
         </button>
       </div>
     </div>

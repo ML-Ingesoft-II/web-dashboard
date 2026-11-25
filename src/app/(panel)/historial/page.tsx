@@ -33,13 +33,13 @@ function BadgeAtencion({ atencion }: { atencion: AtencionEvento }) {
     return (
       <Etiqueta
         clase="bg-tag-critical-bg text-tag-critical-fg"
-        icono="⊘"
+        icono="critico"
         texto="Sin atender"
       />
     );
   if (atencion === "ATENDIDA")
     return (
-      <Etiqueta clase="bg-tag-normal-bg text-tag-normal-fg" icono="✓" texto="Atendida" />
+      <Etiqueta clase="bg-tag-normal-bg text-tag-normal-fg" icono="normal" texto="Atendida" />
     );
   return <span className="text-sm text-fg-muted">No requiere</span>;
 }

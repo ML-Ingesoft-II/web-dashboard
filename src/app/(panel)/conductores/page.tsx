@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ConductorResponse, Pagina } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { formatearDocumento } from "@/lib/format";
+import { Icono } from "@/components/Icono";
 import { Paginacion } from "@/components/Paginacion";
 
 const TAM = 8;
@@ -57,7 +58,8 @@ export default function ConductoresPage() {
           </p>
         </div>
         <Link href="/conductores/nuevo" className="btn-primary">
-          + Registrar conductor
+          <Icono nombre="agregar" />
+          Registrar conductor
         </Link>
       </header>
 

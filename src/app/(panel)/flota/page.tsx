@@ -11,6 +11,7 @@ import type {
 } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { EstadoBadge, Etiqueta } from "@/components/EstadoBadge";
+import { Icono, type NombreIcono } from "@/components/Icono";
 import { Paginacion } from "@/components/Paginacion";
 import {
   ETIQUETA_ESTADO,
@@ -106,11 +107,13 @@ export default function FlotaPage() {
         <div className="card flex items-center justify-around md:flex-col md:justify-center md:gap-4">
           <Resumen
             etiqueta="Crítico"
+            icono="critico"
             valor={conteo.CRITICO ?? 0}
             color="text-critical"
           />
           <Resumen
             etiqueta="Sin señal"
+            icono="sinSenal"
             valor={conteo.SIN_SENAL ?? 0}
             color="text-offline"
           />
@@ -172,12 +175,12 @@ export default function FlotaPage() {
         </span>
         <Etiqueta
           clase="bg-tag-normal-bg text-tag-normal-fg"
-          icono="●"
+          icono="normal"
           texto={`Normal: ${conteo.NORMAL ?? 0}`}
         />
         <Etiqueta
           clase="bg-tag-warning-bg text-tag-warning-fg"
-          icono="▲"
+          icono="precaucion"
           texto={`Precaución: ${conteo.PRECAUCION ?? 0}`}
         />
         <span className="text-fg-muted">
@@ -273,16 +276,19 @@ export default function FlotaPage() {
 
 function Resumen({
   etiqueta,
+  icono,
   valor,
   color,
 }: {
   etiqueta: string;
+  icono: NombreIcono;
   valor: number;
   color: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
       <span className={`flex items-center gap-2 ${color}`}>
+        <Icono nombre={icono} />
         {etiqueta}
       </span>
       <span className="text-5xl font-bold text-fg">{valor}</span>

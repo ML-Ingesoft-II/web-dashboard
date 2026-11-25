@@ -1,5 +1,6 @@
 import type { EstadoMonitoreo } from "@/lib/api-types";
 import { ETIQUETA_ESTADO } from "@/lib/format";
+import { Icono, type NombreIcono } from "@/components/Icono";
 
 /**
  * Etiqueta de estado (StatusTag del sistema de diseño): color, ícono y texto,
@@ -13,12 +14,12 @@ const ESTILOS: Record<EstadoMonitoreo, string> = {
   SIN_VIAJE: "bg-transparent text-fg-muted",
 };
 
-const ICONO: Record<EstadoMonitoreo, string> = {
-  NORMAL: "●",
-  PRECAUCION: "▲",
-  CRITICO: "⊘",
-  SIN_SENAL: "⚡",
-  SIN_VIAJE: "⏸",
+const ICONO: Record<EstadoMonitoreo, NombreIcono> = {
+  NORMAL: "normal",
+  PRECAUCION: "precaucion",
+  CRITICO: "critico",
+  SIN_SENAL: "sinSenal",
+  SIN_VIAJE: "sinViaje",
 };
 
 export function EstadoBadge({ estado }: { estado: EstadoMonitoreo }) {
@@ -32,14 +33,14 @@ export function Etiqueta({
   texto,
 }: {
   clase: string;
-  icono: string;
+  icono: NombreIcono;
   texto: string;
 }) {
   return (
     <span
       className={`inline-flex min-h-8 items-center gap-2 whitespace-nowrap rounded-full py-1 pl-2 pr-3 text-sm font-medium ${clase}`}
     >
-      <span aria-hidden>{icono}</span>
+      <Icono nombre={icono} tamano={18} />
       {texto}
     </span>
   );

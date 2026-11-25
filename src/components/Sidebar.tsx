@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { Sesion } from "@/lib/api-types";
 import { api } from "@/lib/client";
+import { Icono, type NombreIcono } from "@/components/Icono";
 
-const NAV = [
-  { href: "/flota", etiqueta: "Estado de la flota", icono: "🚚" },
-  { href: "/conductores", etiqueta: "Conductores", icono: "👥" },
-  { href: "/historial", etiqueta: "Historial de incidentes", icono: "☰" },
+const NAV: { href: string; etiqueta: string; icono: NombreIcono }[] = [
+  { href: "/flota", etiqueta: "Estado de la flota", icono: "flota" },
+  { href: "/conductores", etiqueta: "Conductores", icono: "conductores" },
+  { href: "/historial", etiqueta: "Historial de incidentes", icono: "historial" },
 ];
 
 export function Sidebar({ sesion }: { sesion: Sesion | null }) {
@@ -49,7 +50,10 @@ export function Sidebar({ sesion }: { sesion: Sesion | null }) {
                   : "text-fg-muted hover:bg-surface hover:text-fg"
               }`}
             >
-              <span aria-hidden>{item.icono}</span>
+              <Icono
+                nombre={item.icono}
+                className={activo ? "text-primary-text" : undefined}
+              />
               {item.etiqueta}
             </Link>
           );
@@ -72,7 +76,8 @@ export function Sidebar({ sesion }: { sesion: Sesion | null }) {
           onClick={cerrarSesion}
           className="flex h-10 items-center gap-2 text-sm text-primary-text hover:underline"
         >
-          <span aria-hidden>⎋</span> Cerrar sesión
+          <Icono nombre="salir" />
+          Cerrar sesión
         </button>
       </div>
     </aside>

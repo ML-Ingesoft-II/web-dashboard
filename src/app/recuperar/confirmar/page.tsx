@@ -4,13 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { AuthCard } from "@/components/AuthCard";
 import { api, ApiError } from "@/lib/client";
+import { Icono } from "@/components/Icono";
 
 function Regla({ ok, texto }: { ok: boolean; texto: string }) {
   return (
     <p className={`flex items-center gap-2 text-sm ${ok ? "text-normal" : "text-fg-muted"}`}>
       {/* El check solo aparece cuando la regla se cumple; el espacio se reserva igual. */}
       <span className="flex h-[18px] w-[18px] items-center justify-center">
-        {ok ? "✓" : "○"}
+        {ok && <Icono nombre="check" tamano={18} />}
       </span>
       {texto}
     </p>

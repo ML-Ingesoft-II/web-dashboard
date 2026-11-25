@@ -68,9 +68,9 @@ export default function DetalleAlertaPage({
           Detalle de {atendida ? "incidente" : "alerta crítica"}
         </h1>
         {atendida ? (
-          <Etiqueta clase="border border-border text-fg-muted" icono="✓" texto="Atendida" />
+          <Etiqueta clase="border border-border text-fg-muted" icono="normal" texto="Atendida" />
         ) : (
-          <Etiqueta clase="bg-tag-critical-bg text-tag-critical-fg" icono="⊘" texto="Sin atender" />
+          <Etiqueta clase="bg-tag-critical-bg text-tag-critical-fg" icono="critico" texto="Sin atender" />
         )}
       </header>
 

@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AlertaDetalleResponse } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { MapaUbicacion } from "@/components/MapaUbicacion";
+import { Etiqueta } from "@/components/EstadoBadge";
 import {
   ETIQUETA_TIPO_EVENTO,
   fechaHoraLarga,
@@ -44,10 +45,10 @@ export default function DetalleAlertaPage({
   });
 
   if (alerta.isLoading) {
-    return <p className="text-slate-400">Cargando…</p>;
+    return <p className="text-fg-muted">Cargando…</p>;
   }
   if (alerta.isError || !alerta.data) {
-    return <p className="text-red-400">No se encontró la alerta.</p>;
+    return <p className="text-critical">No se encontró la alerta.</p>;
   }
 
   const a = alerta.data;
@@ -55,42 +56,42 @@ export default function DetalleAlertaPage({
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <nav className="text-sm text-slate-400">
-        <Link href="/flota" className="text-brand hover:underline">
+      <nav className="text-sm text-fg-muted">
+        <Link href="/flota" className="text-primary-text hover:underline">
           Estado de la flota
         </Link>{" "}
         / {atendida ? "Incidente" : "Alerta crítica"}
       </nav>
 
       <header className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-fg">
           Detalle de {atendida ? "incidente" : "alerta crítica"}
         </h1>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
-            atendida
-              ? "bg-emerald-500/15 text-emerald-400"
-              : "bg-red-500/15 text-red-400"
-          }`}
-        >
-          {atendida ? "✓ Atendida" : "⊘ Sin atender"}
-        </span>
+        {atendida ? (
+          <Etiqueta clase="border border-border text-fg-muted" icono="normal" texto="Atendida" />
+        ) : (
+          <Etiqueta clase="bg-tag-critical-bg text-tag-critical-fg" icono="critico" texto="Sin atender" />
+        )}
       </header>
 
       {/* Banner */}
       <div
-        className={`rounded-2xl p-5 text-white ${
-          atendida ? "bg-slate-800" : "bg-red-600"
+        className={`rounded-card p-6 ${
+          atendida ? "bg-surface text-fg" : "bg-critical-bg text-on-critical"
         }`}
       >
-        <p className="text-xs font-bold uppercase tracking-wide">
+        <p
+          className={`text-sm font-medium uppercase tracking-wide ${
+            atendida ? "text-fg-muted" : "text-on-critical-muted"
+          }`}
+        >
           {atendida ? "Incidente atendido" : "Alerta crítica, sin atender"}
         </p>
         <p className="mt-1 text-lg font-bold">
           {a.conductor.nombreCompleto} no respondió a la alarma de microsueño
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <Dato etiqueta="Tipo de evento" valor="Microsueño sin respuesta" />
+          <Dato etiqueta="Tipo de evento" valor="Microsueño sin respuesta" enAlerta={!atendida} />
           {atendida ? (
             <>
               <Dato etiqueta="Hora del evento" valor={horaLarga(a.fechaEvento)} />
@@ -106,8 +107,9 @@ export default function DetalleAlertaPage({
               <Dato
                 etiqueta="Tiempo sin respuesta"
                 valor={haceCuanto(a.fechaApertura).replace("Hace ", "")}
+                enAlerta
               />
-              <Dato etiqueta="Hora del evento" valor={horaLarga(a.fechaEvento)} />
+              <Dato etiqueta="Hora del evento" valor={horaLarga(a.fechaEvento)} enAlerta />
             </>
           )}
         </div>
@@ -115,7 +117,7 @@ export default function DetalleAlertaPage({
 
       <div className="grid gap-5 md:grid-cols-2">
         <section className="card">
-          <h2 className="mb-4 text-base font-semibold text-slate-100">
+          <h2 className="mb-4 text-base font-semibold text-fg">
             Ubicación del evento
           </h2>
           <MapaUbicacion
@@ -128,7 +130,7 @@ export default function DetalleAlertaPage({
 
         <div className="space-y-5">
           <section className="card">
-            <h2 className="mb-4 text-base font-semibold text-slate-100">
+            <h2 className="mb-4 text-base font-semibold text-fg">
               Conductor y vehículo
             </h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -142,16 +144,16 @@ export default function DetalleAlertaPage({
           </section>
 
           <section className="card">
-            <h2 className="mb-4 text-base font-semibold text-slate-100">
+            <h2 className="mb-4 text-base font-semibold text-fg">
               Línea de tiempo
             </h2>
             <ol className="space-y-3">
               {a.lineaTiempo.map((e, i) => (
                 <li key={i} className="flex gap-3 text-sm">
-                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" />
+                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
                   <div>
-                    <span className="text-slate-400">{horaLarga(e.fechaHora)}</span>{" "}
-                    <span className="text-slate-200">{e.descripcion}</span>
+                    <span className="text-fg-muted">{horaLarga(e.fechaHora)}</span>{" "}
+                    <span className="text-fg">{e.descripcion}</span>
                   </div>
                 </li>
               ))}
@@ -163,10 +165,10 @@ export default function DetalleAlertaPage({
       {/* Nota + accion */}
       {atendida ? (
         <section className="card">
-          <h2 className="mb-2 text-base font-semibold text-slate-100">
+          <h2 className="mb-2 text-base font-semibold text-fg">
             Nota de atención
           </h2>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-fg">
             {a.notasDespachador || "Sin nota."}
           </p>
           <div className="mt-4 flex justify-end">
@@ -187,7 +189,7 @@ export default function DetalleAlertaPage({
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={() => router.push("/flota")} className="btn-ghost">
+            <button onClick={() => router.push("/flota")} className="btn-secondary">
               Volver
             </button>
             <button
@@ -204,11 +206,22 @@ export default function DetalleAlertaPage({
   );
 }
 
-function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
+function Dato({
+  etiqueta,
+  valor,
+  enAlerta = false,
+}: {
+  etiqueta: string;
+  valor: string;
+  /** true cuando el dato va sobre la tarjeta roja de alerta crítica. */
+  enAlerta?: boolean;
+}) {
   return (
     <div>
-      <p className="text-xs text-slate-400">{etiqueta}</p>
-      <p className="font-semibold text-slate-100">{valor}</p>
+      <p className={`text-sm ${enAlerta ? "text-on-critical-muted" : "text-fg-muted"}`}>
+        {etiqueta}
+      </p>
+      <p className={`font-medium ${enAlerta ? "text-on-critical" : "text-fg"}`}>{valor}</p>
     </div>
   );
 }

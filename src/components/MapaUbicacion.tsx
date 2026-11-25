@@ -13,10 +13,11 @@ export function MapaUbicacion({
   longitud: number | null;
   color?: "red" | "blue";
 }) {
-  const marcador = color === "red" ? "#ef4444" : "#3b82f6";
+  // Rojo de alerta crítica o azul de incidente atendido (tokens del sistema).
+  const marcador = color === "red" ? "var(--status-critical-bg)" : "var(--primary-border)";
   return (
     <div>
-      <div className="relative h-64 overflow-hidden rounded-xl bg-slate-800">
+      <div className="relative h-64 overflow-hidden rounded-control bg-[#16213a]">
         {/* calles */}
         <svg className="absolute inset-0 h-full w-full" aria-hidden>
           <g stroke="#475569" strokeWidth="6" opacity="0.5">
@@ -36,11 +37,11 @@ export function MapaUbicacion({
             <circle cx="12" cy="12" r="5" fill="white" />
           </svg>
         </div>
-        <span className="absolute bottom-3 left-3 rounded-lg bg-slate-900/80 px-3 py-1.5 text-xs text-slate-200">
+        <span className="absolute bottom-3 left-3 rounded-lg bg-[rgba(15,23,41,0.85)] px-2.5 py-1.5 text-[13px] text-fg">
           {lugar}
         </span>
       </div>
-      <p className="mt-2 text-xs text-slate-400">
+      <p className="mt-2 text-sm text-fg-muted">
         Coordenadas:{" "}
         {latitud != null && longitud != null
           ? `${latitud.toFixed(4)}, ${longitud.toFixed(4)}`

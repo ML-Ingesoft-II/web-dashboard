@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { ConductorResponse, TipoDocumento } from "@/lib/api-types";
 import { api, ApiError } from "@/lib/client";
 import { ETIQUETA_TIPO_DOCUMENTO } from "@/lib/format";
+import { Icono } from "@/components/Icono";
 
 export interface ConductorFormProps {
   modo: "crear" | "editar";
@@ -106,8 +107,8 @@ export function ConductorForm({ modo, id, inicial }: ConductorFormProps) {
       </div>
 
       {modo === "crear" && (
-        <div className="flex gap-3 rounded-xl bg-slate-800/60 p-4 text-sm text-slate-300">
-          <span aria-hidden>ℹ️</span>
+        <div className="flex gap-3 rounded-control bg-background p-4 text-sm text-fg">
+          <Icono nombre="info" className="text-primary-text" />
           <p>
             La contraseña inicial es el primer apellido y los últimos 4 dígitos del
             documento (por ejemplo, Quintero8392). El conductor deberá cambiarla al
@@ -117,11 +118,11 @@ export function ConductorForm({ modo, id, inicial }: ConductorFormProps) {
       )}
 
       {error && (
-        <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{error}</p>
+        <p className="rounded-lg bg-tag-critical-bg px-3 py-2 text-sm text-critical">{error}</p>
       )}
 
-      <div className="flex justify-end gap-3 border-t border-slate-800 pt-5">
-        <Link href="/conductores" className="btn-ghost">
+      <div className="flex justify-end gap-3 border-t border-border pt-5">
+        <Link href="/conductores" className="btn-secondary">
           Cancelar
         </Link>
         <button type="submit" className="btn-primary" disabled={guardando}>

@@ -30,17 +30,17 @@ export default function RecuperarPage() {
     <AuthCard titulo="Olvidé mi contraseña">
       {enviado ? (
         <div className="space-y-5 text-center">
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-fg">
             Si el correo está registrado, te enviamos un enlace para crear una
             nueva contraseña.
           </p>
-          <Link href="/" className="block text-sm text-brand hover:underline">
+          <Link href="/" className="block text-sm text-primary-text hover:underline">
             Volver a iniciar sesión
           </Link>
         </div>
       ) : (
         <form onSubmit={enviar} className="space-y-4">
-          <p className="text-center text-sm text-slate-400">
+          <p className="text-center text-sm text-fg-muted">
             Escribe tu correo y te enviaremos un enlace para crear una nueva
             contraseña.
           </p>
@@ -63,7 +63,7 @@ export default function RecuperarPage() {
           </button>
           <Link
             href="/"
-            className="block text-center text-sm text-brand hover:underline"
+            className="block text-center text-sm text-primary-text hover:underline"
           >
             Volver a iniciar sesión
           </Link>

@@ -6,25 +6,11 @@ import {
   leerRefreshToken,
   limpiarSesion,
 } from "@/lib/server/session";
+import { respuestaDeFalla, type RespuestaBackend } from "@/lib/server/fallas";
+
+export type { RespuestaBackend };
 
 const API = process.env.TIRE_API_URL ?? "http://localhost:8080";
-
-export interface RespuestaBackend {
-  status: number;
-  ok: boolean;
-  body: unknown;
-}
-
-/** Respuesta cuando el backend no contesta (apagado, sin red, etc.). */
-const SIN_CONEXION: RespuestaBackend = {
-  status: 503,
-  ok: false,
-  body: {
-    title: "Servicio no disponible",
-    status: 503,
-    detail: "No se pudo conectar con el servidor. Intenta de nuevo en unos minutos.",
-  },
-};
 
 async function parse(res: Response): Promise<unknown> {
   const texto = await res.text();
@@ -48,8 +34,8 @@ export async function backendPublico(
       cache: "no-store",
     });
     return { status: res.status, ok: res.ok, body: await parse(res) };
-  } catch {
-    return SIN_CONEXION;
+  } catch (error) {
+    return respuestaDeFalla(error);
   }
 }
 
@@ -104,7 +90,7 @@ export async function backendAutenticado(
       limpiarSesion();
     }
     return { status: res.status, ok: res.ok, body: await parse(res) };
-  } catch {
-    return SIN_CONEXION;
+  } catch (error) {
+    return respuestaDeFalla(error);
   }
 }

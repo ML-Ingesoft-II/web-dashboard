@@ -11,7 +11,11 @@
 /build
 
 # entorno
+.env
 .env*.local
+.env.production
+.env.development
+!.env.example
 
 # logs y sistema
 npm-debug.log*

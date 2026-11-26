@@ -36,7 +36,13 @@ despachadora **Laura Gómez** y 24 conductores con viajes e incidentes de ejempl
 
 ### 2. Configurar el dashboard
 
-El archivo `.env.local` define la URL del backend:
+Copia la plantilla de variables de entorno y ajusta si el backend corre en otro puerto u host:
+
+```bash
+cp .env.example .env.local
+```
+
+Por defecto define:
 
 ```bash
 TIRE_API_URL=http://localhost:8080
@@ -50,6 +56,21 @@ npm run dev
 ```
 
 El panel queda disponible en <http://localhost:3000>.
+
+### 4. Pruebas y Cobertura
+
+El dashboard cuenta con pruebas unitarias y de integración del cliente HTTP, lógica de estados de presentación y proxy BFF utilizando **Vitest** y **MSW (Mock Service Worker)**:
+
+```bash
+# Ejecutar todas las pruebas
+npm test
+
+# Modo interactivo / observador
+npm run test:watch
+
+# Generar reporte de cobertura
+npm run test:coverage
+```
 
 ### Credenciales de ejemplo (perfil `seed`)
 
@@ -118,6 +139,9 @@ src/
 | `npm run build` | Compilación de producción |
 | `npm run start` | Servir la build de producción |
 | `npm run lint` | Linter de Next.js |
+| `npm test` | Ejecutar suite de pruebas con Vitest |
+| `npm run test:watch` | Pruebas en modo observador |
+| `npm run test:coverage` | Generar reporte de cobertura con `@vitest/coverage-v8` |
 
 ## Notas
 

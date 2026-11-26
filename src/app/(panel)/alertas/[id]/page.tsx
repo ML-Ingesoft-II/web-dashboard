@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AlertaDetalleResponse } from "@/lib/api-types";
-import { api } from "@/lib/client";
+import { api, ApiError } from "@/lib/client";
+import { estadoDeConsulta, mensajeDeError } from "@/lib/estados";
+import { Aviso } from "@/components/Aviso";
+import { EstadoVista } from "@/components/EstadoVista";
 import { MapaUbicacion } from "@/components/MapaUbicacion";
 import { Etiqueta } from "@/components/EstadoBadge";
 import {
@@ -44,11 +47,31 @@ export default function DetalleAlertaPage({
     },
   });
 
-  if (alerta.isLoading) {
-    return <p className="text-fg-muted">Cargando…</p>;
-  }
-  if (alerta.isError || !alerta.data) {
-    return <p className="text-critical">No se encontró la alerta.</p>;
+  if (!alerta.data) {
+    const noExiste = alerta.error instanceof ApiError && alerta.error.status === 404;
+    return (
+      <div className="mx-auto max-w-5xl space-y-6">
+        <nav className="text-sm text-fg-muted">
+          <Link href="/flota" className="text-primary-text hover:underline">
+            Estado de la flota
+          </Link>{" "}
+          / Alerta
+        </nav>
+        {noExiste ? (
+          <Aviso titulo="No se encontró la alerta.">
+            Es posible que el enlace esté incompleto. Vuelve al estado de la flota.
+          </Aviso>
+        ) : (
+          <EstadoVista
+            estado={estadoDeConsulta(alerta, false)}
+            error={alerta.error}
+            textoVacio=""
+            textoError="No se pudo cargar la alerta."
+            onReintentar={() => alerta.refetch()}
+          />
+        )}
+      </div>
+    );
   }
 
   const a = alerta.data;
@@ -161,6 +184,12 @@ export default function DetalleAlertaPage({
           </section>
         </div>
       </div>
+
+      {atender.isError && (
+        <Aviso titulo="No se pudo marcar la alerta como atendida.">
+          {mensajeDeError(atender.error, "Intenta de nuevo.")}
+        </Aviso>
+      )}
 
       {/* Nota + accion */}
       {atendida ? (

@@ -10,7 +10,10 @@ import type {
   EstadoMonitoreo,
 } from "@/lib/api-types";
 import { api } from "@/lib/client";
+import { estadoDeConsulta, mensajeDeError } from "@/lib/estados";
+import { Aviso } from "@/components/Aviso";
 import { EstadoBadge, Etiqueta } from "@/components/EstadoBadge";
+import { EstadoVista, FilaEstado } from "@/components/EstadoVista";
 import { Icono, type NombreIcono } from "@/components/Icono";
 import { Paginacion } from "@/components/Paginacion";
 import {
@@ -92,15 +95,54 @@ export default function FlotaPage() {
   );
   const totalPagSinViaje = Math.max(1, Math.ceil(sinViaje.length / TAM_PAGINA));
 
+  // Sin datos todavía (primera carga, error o 403): solo se muestra el estado.
+  const estadoInicial = estadoDeConsulta(flota, false);
+  const enVivo = !flota.isError;
+
+  const encabezado = (
+    <header className="flex items-center justify-between">
+      <h1 className="text-2xl font-bold text-fg">Estado de la flota</h1>
+      {flota.data && (
+        <span className="flex items-center gap-2 text-sm text-fg-muted">
+          <span className={`h-2 w-2 rounded-full ${enVivo ? "bg-normal" : "bg-offline"}`} />
+          {!enVivo ? "Sin actualizar" : flota.isFetching ? "Actualizando…" : "En vivo"}
+        </span>
+      )}
+    </header>
+  );
+
+  if (!flota.data) {
+    return (
+      <div className="mx-auto max-w-6xl space-y-6">
+        {encabezado}
+        <EstadoVista
+          estado={estadoInicial}
+          error={flota.error}
+          textoVacio=""
+          textoError="No se pudo cargar el estado de la flota."
+          onReintentar={() => flota.refetch()}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-fg">Estado de la flota</h1>
-        <span className="flex items-center gap-2 text-sm text-fg-muted">
-          <span className="h-2 w-2 rounded-full bg-normal" />
-          {flota.isFetching ? "Actualizando…" : "En vivo"}
-        </span>
-      </header>
+      {encabezado}
+
+      {/* Los datos siguen visibles si falla una actualización automática. */}
+      {flota.isError && (
+        <Aviso
+          titulo="No se pudo actualizar la flota. Se muestran los últimos datos recibidos."
+          acciones={
+            <button onClick={() => flota.refetch()} className="btn-secondary min-h-9 px-3 text-sm">
+              Reintentar
+            </button>
+          }
+        >
+          {mensajeDeError(flota.error, "Ocurrió un error inesperado.")}
+        </Aviso>
+      )}
 
       {/* Resumen + banner de alerta critica */}
       <section className="grid gap-4 md:grid-cols-[260px_1fr]">
@@ -120,7 +162,22 @@ export default function FlotaPage() {
         </div>
 
         <div className="space-y-3">
-          {alertaAbierta ? (
+          {atender.isError && (
+            <Aviso titulo="No se pudo marcar la alerta como atendida.">
+              {mensajeDeError(atender.error, "Intenta de nuevo.")}
+            </Aviso>
+          )}
+          {alertas.isError && !alertas.data ? (
+            <EstadoVista
+              estado={estadoDeConsulta(alertas, false)}
+              error={alertas.error}
+              textoVacio=""
+              textoError="No se pudieron cargar las alertas críticas."
+              onReintentar={() => alertas.refetch()}
+            />
+          ) : alertas.isLoading ? (
+            <div className="card text-sm text-fg-muted">Cargando alertas…</div>
+          ) : alertaAbierta ? (
             <div className="rounded-card bg-critical-bg p-5 text-on-critical">
               <p className="text-sm font-medium uppercase tracking-wide text-on-critical-muted">
                 Alerta crítica
@@ -224,7 +281,14 @@ export default function FlotaPage() {
           </div>
         </div>
 
-        <TablaEnViaje items={pagEnViajeItems} />
+        <TablaEnViaje
+          items={pagEnViajeItems}
+          textoVacio={
+            totalEnViaje === 0
+              ? "No hay conductores en viaje en este momento."
+              : "Ningún conductor en viaje coincide con la búsqueda o el filtro."
+          }
+        />
 
         <Paginacion
           mostrando={`Mostrando ${pagEnViajeItems.length} de ${enViajeFiltrados.length} conductores en viaje`}
@@ -248,6 +312,12 @@ export default function FlotaPage() {
               </tr>
             </thead>
             <tbody>
+              <FilaEstado
+                columnas={4}
+                estado={sinViaje.length === 0 ? "vacio" : "ok"}
+                textoVacio="Todos los conductores activos están en viaje."
+                textoError=""
+              />
               {pagSinViajeItems.map((c) => (
                 <tr key={c.conductor.id} className="border-b border-border">
                   <td className="td">{c.conductor.nombreCompleto}</td>
@@ -296,7 +366,13 @@ function Resumen({
   );
 }
 
-function TablaEnViaje({ items }: { items: ConductorEnViaje[] }) {
+function TablaEnViaje({
+  items,
+  textoVacio,
+}: {
+  items: ConductorEnViaje[];
+  textoVacio: string;
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -311,6 +387,12 @@ function TablaEnViaje({ items }: { items: ConductorEnViaje[] }) {
           </tr>
         </thead>
         <tbody>
+          <FilaEstado
+            columnas={6}
+            estado={items.length === 0 ? "vacio" : "ok"}
+            textoVacio={textoVacio}
+            textoError=""
+          />
           {items.map((c) => (
             <tr key={c.conductor.id} className="border-b border-border">
               <td className="td">

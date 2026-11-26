@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { AuthCard } from "@/components/AuthCard";
 import { api, ApiError } from "@/lib/client";
+import { Aviso } from "@/components/Aviso";
 import { Icono } from "@/components/Icono";
 
 function Regla({ ok, texto }: { ok: boolean; texto: string }) {
@@ -103,9 +104,7 @@ function Formulario() {
       </div>
 
       {error && (
-        <p className="rounded-lg bg-tag-critical-bg px-3 py-2 text-sm text-critical">
-          {error}
-        </p>
+        <Aviso sobreSuperficie>{error}</Aviso>
       )}
 
       <button

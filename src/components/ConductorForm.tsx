@@ -6,6 +6,8 @@ import { useState } from "react";
 import type { ConductorResponse, TipoDocumento } from "@/lib/api-types";
 import { api, ApiError } from "@/lib/client";
 import { ETIQUETA_TIPO_DOCUMENTO } from "@/lib/format";
+import { mensajeDeError } from "@/lib/estados";
+import { Aviso } from "@/components/Aviso";
 import { Icono } from "@/components/Icono";
 
 export interface ConductorFormProps {
@@ -56,7 +58,7 @@ export function ConductorForm({ modo, id, inicial }: ConductorFormProps) {
     } catch (err) {
       setError(
         err instanceof ApiError
-          ? err.problem.detail || "Revisa los datos del formulario."
+          ? mensajeDeError(err, "Revisa los datos del formulario.")
           : "No se pudo guardar."
       );
       setGuardando(false);
@@ -118,7 +120,9 @@ export function ConductorForm({ modo, id, inicial }: ConductorFormProps) {
       )}
 
       {error && (
-        <p className="rounded-lg bg-tag-critical-bg px-3 py-2 text-sm text-critical">{error}</p>
+        <Aviso sobreSuperficie titulo="No se pudo guardar el conductor.">
+          {error}
+        </Aviso>
       )}
 
       <div className="flex justify-end gap-3 border-t border-border pt-5">

@@ -6,6 +6,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ConductorResponse, Pagina } from "@/lib/api-types";
 import { api } from "@/lib/client";
 import { formatearDocumento } from "@/lib/format";
+import { estadoDeConsulta, mensajeDeError } from "@/lib/estados";
+import { Aviso } from "@/components/Aviso";
+import { FilaEstado } from "@/components/EstadoVista";
 import { Icono } from "@/components/Icono";
 import { Paginacion } from "@/components/Paginacion";
 
@@ -33,14 +36,10 @@ export default function ConductoresPage() {
   const desactivar = useMutation({
     mutationFn: (id: string) => api(`/conductores/${id}`, { method: "DELETE" }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["conductores"] }),
-    onError: (e: unknown) => {
-      alert(
-        e && typeof e === "object" && "message" in e
-          ? String((e as { message: string }).message)
-          : "No se pudo desactivar."
-      );
-    },
   });
+
+  const estadoTabla = estadoDeConsulta(query, (query.data?.contenido.length ?? 0) === 0);
+  const hayFiltros = q.trim() !== "" || estado !== "activos";
 
   const datos = query.data;
   const total = datos?.totalElementos ?? 0;
@@ -62,6 +61,12 @@ export default function ConductoresPage() {
           Registrar conductor
         </Link>
       </header>
+
+      {desactivar.isError && (
+        <Aviso titulo="No se pudo desactivar al conductor.">
+          {mensajeDeError(desactivar.error, "Intenta de nuevo.")}
+        </Aviso>
+      )}
 
       <section className="card">
         <div className="mb-4 grid gap-4 md:grid-cols-2">
@@ -107,13 +112,18 @@ export default function ConductoresPage() {
               </tr>
             </thead>
             <tbody>
-              {query.isLoading && (
-                <tr>
-                  <td className="td text-fg-muted" colSpan={6}>
-                    Cargando…
-                  </td>
-                </tr>
-              )}
+              <FilaEstado
+                columnas={6}
+                estado={estadoTabla}
+                error={query.error}
+                textoVacio={
+                  hayFiltros
+                    ? "Ningún conductor coincide con la búsqueda o el filtro."
+                    : "Todavía no hay conductores registrados en tu flota."
+                }
+                textoError="No se pudieron cargar los conductores."
+                onReintentar={() => query.refetch()}
+              />
               {datos?.contenido.map((c) => (
                 <tr key={c.id} className="border-b border-border">
                   <td className="td font-medium text-fg">

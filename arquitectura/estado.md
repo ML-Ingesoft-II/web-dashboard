@@ -9,7 +9,7 @@ criterios (a)–(e) exigidos. Hecha a partir del código real.
 |---|---|
 | (a) Login real + `Authorization: Bearer` + guardado seguro del token | ✅ Cumple |
 | (b) Flujo del MVP: listar, ver detalle, crear + una operación más | ✅ Cumple |
-| (c) Estados de la interfaz (cargando / vacío / error, 401→login, 403→mensaje) | ⚠️ Parcial |
+| (c) Estados de la interfaz (cargando / vacío / error, 401→login, 403→mensaje) | ✅ Cumple |
 | (d) La vista no llama directamente a la API | ✅ Cumple |
 | (e) URL del backend en configuración, no en el código | ✅ Cumple |
 
@@ -38,32 +38,35 @@ Recurso de dominio **Conductor**:
 Acción de negocio extra: **atender alerta** (`PATCH /alertas/{id}/atender`) desde
 el estado de la flota y el detalle de alerta.
 
-### (c) Estados de la interfaz — ⚠️ Parcial
+### (c) Estados de la interfaz — ✅
 
-Cubierto:
+- **Lógica de presentación:** `estadoDeConsulta()` y `mensajeDeError()` en
+  `src/lib/estados.ts` deciden qué mostrar (cargando, vacío, error, sin permiso o
+  datos) a partir de la consulta. Son funciones sin React, listas para pruebas
+  unitarias.
+- **Componentes:** `EstadoVista` / `FilaEstado` (`src/components/EstadoVista.tsx`)
+  y `Aviso` (`src/components/Aviso.tsx`), con tono neutro: el rojo queda solo
+  para las alertas críticas, como pide el sistema de diseño.
+- **Cargando / vacío / error / éxito** en `flota`, `conductores`, `historial`,
+  detalle de alerta y edición de conductor. Los errores ofrecen "Reintentar". En
+  `flota`, si falla una actualización automática se mantienen los últimos datos
+  con un aviso.
+- **401 → inicio de sesión:** si el refresh token tampoco sirve, el proxy borra
+  las cookies (`src/lib/server/backend.ts`) y `api()` (`src/lib/client.ts`)
+  lleva a `/?motivo=sesion-expirada`, donde el login muestra "Tu sesión expiró".
+- **403 → mensaje:** las pantallas muestran "No tienes permiso"; el login con un
+  usuario que no es despachador muestra "Este panel es solo para despachadores".
+- **Backend caído:** el proxy responde `503` con un mensaje claro en vez de un
+  error 500.
 
-- **Cargando:** todas las pantallas con datos muestran estado de carga
-  (`isLoading` / "Cargando…"); las acciones muestran "Guardando…".
-- **Éxito:** render de datos y navegación tras crear/editar/atender.
-- **Vacío (parcial):** la tarjeta de alerta muestra "No hay alertas críticas sin
-  atender".
-- **Error (parcial):** el login muestra el error; el detalle de alerta y la
-  edición de conductor muestran "No se encontró…".
+Cómo reproducir cada caso para el video:
 
-Pendiente:
-
-1. **Estado de error** en las pantallas de lista `flota`, `conductores` e
-   `historial` (hoy no muestran mensaje si la consulta falla).
-2. **Estado vacío** en las tablas (p. ej. "No hay conductores en ruta",
-   "Sin incidentes en el rango").
-3. **401 → inicio de sesión:** si el refresh también falla, el cliente aún no
-   redirige automáticamente al login desde `api()`.
-4. **403 → mensaje de permiso insuficiente:** falta un manejo explícito que
-   muestre "no tienes permiso" ante un `403`.
-
-Trabajo estimado para cerrarlo: un manejo global de `401`/`403` en el cliente
-(`src/lib/client.ts`) más un componente reutilizable de estado (vacío/error) en
-las tres pantallas de lista.
+| Caso | Pasos |
+|---|---|
+| 403 | Iniciar sesión con un conductor del perfil `seed` (p. ej. `apineda@tandinos.co` / `Pineda2337`). |
+| 401 | Con el panel abierto, borrar las cookies `tire_access` y `tire_refresh` en DevTools (Application → Cookies) y esperar la siguiente actualización de la flota. |
+| Error | Apagar el backend con el panel abierto: aparece el aviso con "Reintentar". |
+| Vacío | En `conductores` o `historial`, buscar o filtrar algo que no exista. |
 
 ### (d) Arquitectura del cliente — ✅
 
